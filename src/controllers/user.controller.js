@@ -156,7 +156,9 @@ const logoutUser = asyncHandler(async (req, res) => {
   const response = await User.findByIdAndUpdate(
     req.user._id,
     {
-      refreshToken: null,
+      $unset: {
+        refreshToken: 1,
+      },
     },
     {
       new: true,
@@ -239,8 +241,10 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
   const user = await User.findByIdAndUpdate(
     req.user?._id,
     {
-      fullName,
-      email,
+      $set: {
+        fullName,
+        email,
+      },
     },
     { new: true }
   ).select("-password");
