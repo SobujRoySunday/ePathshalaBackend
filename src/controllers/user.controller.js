@@ -30,13 +30,15 @@ const generateAccessAndRefreshTokens = async (userID) => {
 };
 
 const registerUser = asyncHandler(async (req, res) => {
+  console.log("Request: REGISTER NEW USER");
+
   // get user details from the frontend
   const { username, email, fullName, userRole, password } = req.body;
 
   // validation of the recieved data: not empty
   if (
     [fullName, email, username, password, userRole].some(
-      (field) => field?.trim() === ""
+      (field) => field && field?.trim() === ""
     )
   ) {
     throw new ApiError(400, "All fields are required");
@@ -97,10 +99,16 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   // return response
-  console.log("New user created: ", createdUser);
+  console.log("Response: REGISTERED NEW USER");
   return res
     .status(201)
-    .json(new ApiResponse(201, createdUser.id, "User registered successfully"));
+    .json(
+      new ApiResponse(
+        201,
+        { id: createdUser.id, userRole: createdUser.userRole },
+        "User registered successfully"
+      )
+    );
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -128,7 +136,8 @@ const loginUser = asyncHandler(async (req, res) => {
 
   // access and refresh token
   const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
-    user._id
+    user._id,
+    user.userRole
   );
 
   // send cookie
