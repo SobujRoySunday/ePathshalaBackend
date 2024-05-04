@@ -102,13 +102,7 @@ const registerUser = asyncHandler(async (req, res) => {
   console.log("Response: REGISTERED NEW USER");
   return res
     .status(201)
-    .json(
-      new ApiResponse(
-        201,
-        { id: createdUser.id, userRole: createdUser.userRole },
-        "User registered successfully"
-      )
-    );
+    .json(new ApiResponse(201, createdUser.id, "User registered successfully"));
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -136,8 +130,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
   // access and refresh token
   const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
-    user._id,
-    user.userRole
+    user._id
   );
 
   // send cookie
@@ -146,8 +139,14 @@ const loginUser = asyncHandler(async (req, res) => {
   );
   return res
     .status(200)
-    .cookie("accessToken", accessToken, cookieOptions)
-    .cookie("refreshToken", refreshToken, cookieOptions)
+    .cookie("accessToken", accessToken, {
+      ...cookieOptions,
+      maxAge: parseInt(process.env.ACCESS_TOKEN_EXPIRY) * 1000 * 60 * 60 * 24,
+    })
+    .cookie("refreshToken", refreshToken, {
+      ...cookieOptions,
+      maxAge: parseInt(process.env.REFRESH_TOKEN_EXPIRY) * 1000 * 60 * 60 * 24,
+    })
     .json(
       new ApiResponse(
         200,
