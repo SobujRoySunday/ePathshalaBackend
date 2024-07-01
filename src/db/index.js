@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import {getCurrentTimeString} from '../utils/getCurrentTimeString.js';
 
 const connectDB = async () => {
   try {
@@ -6,10 +7,10 @@ const connectDB = async () => {
       `${process.env.MONGODB_URI}`
     );
     console.log(
-      `MongoDB connected! DB HOST: ${connectionInstance.connection.host}`
+      `${getCurrentTimeString()}MongoDB connected! DB HOST: ${connectionInstance.connection.host}`
     );
   } catch (error) {
-    console.log("MongoDB connection error: ", error);
+    console.log(getCurrentTimeString() + "MongoDB connection error: ", error);
     process.exit(1);
   }
 };
